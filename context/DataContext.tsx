@@ -24,6 +24,7 @@ interface DataContextType {
   prizeRedemptions: PrizeRedemption[];
   addUser: (userData: Omit<User, 'id' | 'role' | 'status' | 'profilePictureUrl' | 'registrationDate' | 'points' | 'pointsHistory' | 'eventHistory' | 'reservationHistory' >) => boolean;
   updateUser: (updatedUser: User) => void;
+  deleteUser: (userId: number) => void;
   awardPoints: (userId: number, points: number, reason: string) => void;
   confirmSaleAndAwardPoints: (reservationId: number, points: number) => void;
   redeemPrize: (userId: number, prizeId: number) => boolean;
@@ -86,6 +87,10 @@ export const DataProvider: React.FC<{children: React.ReactNode}> = ({ children }
     };
     const updateUser = (updatedUser: User) => {
         setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+    };
+
+    const deleteUser = (userId: number) => {
+        setUsers(prev => prev.filter(u => u.id !== userId));
     };
 
     // POINTS & REWARDS FUNCTIONS
@@ -193,7 +198,7 @@ export const DataProvider: React.FC<{children: React.ReactNode}> = ({ children }
             addProduct, updateProduct, deleteProduct,
             addAnnouncement, updateAnnouncement, deleteAnnouncement,
             addDj, updateDj, deleteDj, reorderDjs,
-            addUser, updateUser, awardPoints, confirmSaleAndAwardPoints, redeemPrize,
+            addUser, updateUser, deleteUser, awardPoints, confirmSaleAndAwardPoints, redeemPrize,
             addPrize, updatePrize, deletePrize, updateRedemptionStatus,
             radioConfig, updateRadioConfig
         }}>

@@ -39,11 +39,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode }) =
   const handleSocioLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const success = login(loginEmail, loginPass);
-    if (success) {
+    const result = login(loginEmail, loginPass);
+    if (result === true) {
       onClose();
-    } else {
-      setError('Credenciales de socio incorrectas.');
+    } else if (typeof result === 'string') {
+      setError(result);
     }
   };
 

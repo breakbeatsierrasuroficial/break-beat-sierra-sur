@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { USERS } from '../../constants';
+import React, { useState, useContext } from 'react';
+import { DataContext } from '../../context/DataContext';
 import { User } from '../../types';
 
 const UserManagement = () => {
-    const [users, setUsers] = useState<User[]>(USERS);
+    const { users, updateUser, deleteUser } = useContext(DataContext);
     const [filter, setFilter] = useState<'all' | 'pending' | 'verified'>('all');
 
-    const handleVerify = (id: number) => {
-        setUsers(users.map(u => u.id === id ? { ...u, status: 'VERIFIED' } : u));
+    const handleAccept = (user: User) => {
+        updateUser({ ...user, status: 'VERIFIED' });
     }
-    const handleDelete = (id: number) => {
-        if(window.confirm('¿Seguro que quieres eliminar este usuario?')) {
-            setUsers(users.filter(u => u.id !== id));
+    const handleReject = (id: number) => {
+        if(window.confirm('¿Seguro que quieres rechazar y eliminar a este usuario? Esta acción no se puede deshacer.')) {
+            deleteUser(id);
         }
     }
     
@@ -37,6 +37,8 @@ const UserManagement = () => {
                             <th scope="col" className="px-6 py-3">ID Socio</th>
                             <th scope="col" className="px-6 py-3">Nombre</th>
                             <th scope="col" className="px-6 py-3">Email</th>
+                            <th scope="col" className="px-6 py-3">Registrado</th>
+                            <th scope="col" className="px-6 py-3">Puntos</th>
                             <th scope="col" className="px-6 py-3">Estado</th>
                             <th scope="col" className="px-6 py-3">Acciones</th>
                         </tr>
@@ -47,19 +49,22 @@ const UserManagement = () => {
                                 <td className="px-6 py-4 font-medium text-white">{user.socioId}</td>
                                 <td className="px-6 py-4">{user.name}</td>
                                 <td className="px-6 py-4">{user.email}</td>
+                                <td className="px-6 py-4">{user.registrationDate}</td>
+                                <td className="px-6 py-4">{user.points}</td>
                                 <td className="px-6 py-4">
                                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${user.status === 'VERIFIED' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
                                         {user.status === 'PENDING' ? 'Pendiente' : 'Verificado'}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 flex space-x-2">
-                                    {user.status === 'PENDING' && <button onClick={() => handleVerify(user.id)} className="text-blue-400 hover:underline">Verificar</button>}
-                                    <button onClick={() => handleDelete(user.id)} className="text-red-400 hover:underline">Eliminar</button>
+                                <td className="px-6 py-4 flex space-x-4">
+                                    {user.status === 'PENDING' && <button onClick={() => handleAccept(user)} className="text-green-400 hover:underline">Aceptar</button>}
+                                    <button onClick={() => handleReject(user.id)} className="text-red-400 hover:underline">Rechazar</button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+                 {filteredUsers.length === 0 && <p className="text-center p-8 text-gray-500">No hay usuarios que coincidan con los filtros seleccionados.</p>}
             </div>
         </div>
     );

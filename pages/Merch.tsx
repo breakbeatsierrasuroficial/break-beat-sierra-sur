@@ -10,8 +10,9 @@ const ProductCard: React.FC<{ product: Product; onConfirmReservation: (productId
     const [quantity, setQuantity] = useState(1);
 
     const canReserve = user && user.role === 'SOCIO' && user.status === 'VERIFIED';
-    // Fix: Explicitly typing the reducer parameters to resolve incorrect type inference.
-    const totalStock = Object.values(product.stock).reduce((sum: number, current: number) => sum + current, 0);
+    // Fix: Let TypeScript infer the types for the reduce function's parameters.
+    // The accumulator 'sum' is correctly typed as a number from the initial value '0'.
+    const totalStock = Object.values(product.stock).reduce((sum, current) => sum + current, 0);
     const isProductAvailable = product.active && totalStock > 0;
     
     const maxQuantity = selectedSize ? product.stock[selectedSize] : 0;

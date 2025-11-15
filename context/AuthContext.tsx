@@ -4,7 +4,7 @@ import { DataContext } from './DataContext';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, pass: string) => boolean;
+  login: (email: string, pass: string) => boolean | string;
   adminLogin: (user: string, pass: string) => boolean;
   logout: () => void;
   register: (userData: Omit<User, 'id' | 'role' | 'status' | 'profilePictureUrl' | 'registrationDate' | 'points' | 'pointsHistory' | 'eventHistory' | 'reservationHistory' >) => boolean;
@@ -49,15 +49,21 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     }
   }, [users, user]);
 
-  const login = (email: string, pass: string): boolean => {
+  const login = (email: string, pass: string): boolean | string => {
     // In a real app, you'd check the password hash
     const foundUser = users.find(u => u.email === email && u.role === 'SOCIO');
-    if (foundUser) {
-      setUser(foundUser);
-      localStorage.setItem('authUser', JSON.stringify(foundUser));
-      return true;
+    if (!foundUser) {
+        return 'Credenciales de socio incorrectas.';
     }
-    return false;
+
+    if (foundUser.status === 'PENDING') {
+        return 'Tu cuenta está pendiente de verificación por un administrador.';
+    }
+
+    // If user is VERIFIED
+    setUser(foundUser);
+    localStorage.setItem('authUser', JSON.stringify(foundUser));
+    return true;
   };
   
   const updateUser = (updatedUser: User) => {
